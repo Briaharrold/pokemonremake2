@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+@import url('https://fonts.googleapis.com/css2?family=Agbalumo&family=Lexend:wght@100..900&display=swap');
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -30,4 +30,18 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+.lexendFont{
+ font-family: "Lexend",sans-serif;
+}
+.bg{
+  background-image: url(../../public/assets/PokeBackground.png);
+  background-size: cover;
+  background-position: center; 
+  background-repeat: no-repeat;
+}
+.container{
+  display: block;
+
+  width:500px;
 }
