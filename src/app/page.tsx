@@ -1,14 +1,23 @@
+"use client"
 import Image from "next/image";
 import { Button } from "flowbite-react";
 import HeartBtn from "../../public/assets/Vector-2.png";
 import Charizard from "../../public/assets/Charizard 1-2.png";
+import Favorited from "../../public/assets/Favorited.png";
+import { useState,useEffect } from "react";
 export default function Home() {
+  const  [Fav, setHandleFav] = useState<boolean>(false);
+  const handleFav = () => {
+    setHandleFav(!Fav)
+} 
+
+
   return (
     <div className="bg h-screen bg-no-repeat">
       <h1 className="text-center text-5xl font-bold pt-2  ">Pokedex</h1>
       <div className=" flex flex-col-3 justify-center gap-3 pt-2 ">
         <div>
-          <input className="rounded-lg lexendFont font-extralight text-black px-1"></input>
+          <input className="rounded-lg w-40 lexendFont font-extralight text-black px-1"></input>
         </div>
         <div>
           <Button className="lexendFont w-24 cursor-pointer hover:border-blue-400 bg-blue-700 px-2 rounded-lg font-semibold border-transparent">
@@ -27,7 +36,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col-3 justify-evenly px-96 mx-52 pt-6">
+      <div className="flex flex-col-3 justify-evenly px-96 mx-28 pt-10">
         <div className="">
           <h1 className="text-2xl font-bold">#006</h1>
         </div>
@@ -66,7 +75,7 @@ export default function Home() {
       <div className="flex justify-center mt-20">
         <img src={Charizard.src} alt="Pokemon"></img>
       </div>
-      <div className="flex justify-center pt-40">
+      <div className="flex justify-center pt-1">
         <div className="flex justify-center bg-gray-500 rounded-3xl bg-opacity-80 h-48 w-1/2 px-5">
           <h1 className="text-center text-3xl lexendFont font-bold ">
             Evolutions:
