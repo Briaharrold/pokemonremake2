@@ -31,12 +31,13 @@ export default function Home() {
   const [shinyPokemon, setShinyPokemon] = useState(false);
   const [favorites, setFavorites] = useState<IFavorite[]>([]);
   const [evoChain, setEvoChain] = useState<IEvoChainItem[]>([]);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     const fetchEvoChain = async () => {
       if (pokemonEvoluton.length > 0) {
         const chain  = await getEvoChain();
-        setEvoChain(chain);
+        // setEvoChain(chain);
       }
     };
   
@@ -62,8 +63,9 @@ const handleRemoveFav = (favoriteId: number) => {
   const updatedFavorites = favorites.filter((favorite) => favorite.id !== favoriteId);
   setFavorites(updatedFavorites);
   localStorage.setItem("Favorites", JSON.stringify(updatedFavorites));
+  setIsFavorited(false);
 };
-  function getLocalStorage(): Favorite[] {
+  function getLocalStorage(): IFavorite[] {
     let localStorageData = localStorage.getItem("Favorites");
     if (localStorageData == null) {
       return [];
@@ -118,6 +120,7 @@ const handleRemoveFav = (favoriteId: number) => {
   };
 
   const handleFav = () => {
+   
     if (pokemon) {
       const newFavorite: IFavorite = {
         id: pokemon.id,
@@ -132,6 +135,9 @@ const handleRemoveFav = (favoriteId: number) => {
         const updatedFavorites = [...favorites, newFavorite];
         setFavorites(updatedFavorites);
         localStorage.setItem("Favorites", JSON.stringify(updatedFavorites));
+        setIsFavorited(true);
+      }else{
+        setIsFavorited(false);
       }
     }
   };
@@ -169,13 +175,13 @@ const handleRemoveFav = (favoriteId: number) => {
   return (
     <div className="bg h-screen bg-no-repeat">
       <h1 className="text-center text-5xl font-bold pt-2">Pokedex</h1>
-      <div className="flex flex-col-3 justify-center gap-3 pt-2">
+      <div className="flex flex-wrap flex-col-3 justify-center gap-3 pt-2">
         <div>
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="type number or name"
-            className="rounded-lg w-40 lexendFont font-extralight text-black px-1"
+            className="rounded-lg   lg:w-40 lexendFont font-extralight text-black px-1"
           ></input>
         </div>
         <div>
@@ -196,7 +202,7 @@ const handleRemoveFav = (favoriteId: number) => {
         </div>
       </div>
 
-      <div className="flex flex-col-3 justify-evenly px-96 mx-28 pt-10">
+      <div className="flex flex-col-3 justify-evenly px-0 mx-1 lg:px-96 lg:mx-28 pt-10">
         <div className="">
           <h1 className="text-2xl font-bold">#{pokemon && pokemon.id}</h1>
         </div>
@@ -212,13 +218,14 @@ const handleRemoveFav = (favoriteId: number) => {
               className="h-5"
               alt="Heart Button"
               onClick={handleFav}
-              src={HeartBtn.src}
+              src={isFavorited ? Favorited.src : HeartBtn.src}
+              
             ></img>
           </button>
         </div>
       </div>
-      <div className="flex flex-col-6 justify-evenly px-96 mx-52">
-        <div>
+      <div className="flex flex-col-6 justify-evenl px-1 mx-1  lg:px-96 lg:mx-52">
+        <div className="">
           <h1 className="text-xl font-bold lexendFont">Type:</h1>
           <h1 className="text-xl font-bold lexendFont pt-2">Location:</h1>
           <h1 className="text-xl font-bold lexendFont pt-2">Abilities:</h1>
@@ -231,13 +238,13 @@ const handleRemoveFav = (favoriteId: number) => {
           <h1 className="text-base font-bold lexendFont overflower">
             {pokemonLocation
               ?.map((location) => location.location_area.name)
-              .join(", ") }  
+              .join(", ") || 'N/A'}  
           
           </h1>
           <h1 className="text-base font-bold lexendFont  overflower">
             {pokemon?.abilities
               ?.map((ability) => ability.ability.name)
-              .join(", ")}
+              .join(", ") || 'N/A'}  
           </h1>
           <h1 className="text-base font-bold lexendFont  overflower">
             {pokemon?.moves?.map((move) => move.move.name).join(", ")}
@@ -252,17 +259,20 @@ const handleRemoveFav = (favoriteId: number) => {
         ></img>
       </div>
       <div className="flex justify-center pt-1">
-        <div className="flex justify-center bg-gray-500 rounded-3xl bg-opacity-80 h-48 w-1/2 px-5">
+        <div className="flex justify-center bg-gray-500 rounded-3xl bg-opacity-80 h-fit lg:h-48 w-1/2 px-5">
           <div className="flex justify-center items-center space-x-4">
           <h1 className="text-center text-3xl lexendFont font-bold">
             Evolutions:
           </h1>
+          <div className="flex gap-2 overflower mr-4">
       {evoChain.map((evo) => (
-        <div key={evo.name} className="flex flex-col items-center">
+        <div key={evo.name} className="flex  flex-col items-center">
           <img src={evo.sprite} alt={evo.name} className="w-20 h-20" />
           <span className="text-2xl lexendFont">{evo.name}</span>
         </div>
+      
       ))}
+      </div>
     </div>
         </div>
       </div>
@@ -270,7 +280,7 @@ const handleRemoveFav = (favoriteId: number) => {
   );
 }
 
-export const getLocalStorage = (): IFavorite[] => {
+export const getLocalStorage = () => {
   let localStorageData = localStorage.getItem("Favorites");
 
   if (localStorageData == null) {
