@@ -1,87 +1,279 @@
-"use client"
+"use client";
 import Image from "next/image";
-import { Button } from "flowbite-react";
+import { Button, Modal } from "flowbite-react";
 import HeartBtn from "../../public/assets/Vector-2.png";
 import Charizard from "../../public/assets/Charizard 1-2.png";
 import Favorited from "../../public/assets/Favorited.png";
-import { useState,useEffect } from "react";
+import { ModalComponent } from "./Components/ModalComopnent";
+import { useState, useEffect } from "react";
+import {
+  pokemonApi,
+  pokemonSpeciesData,
+  pokemonLocationData,
+  pokemonEvolveData,
+} from "./DataServices/DataServices";
+import {
+  IEvolution,
+  ILocation,
+  IPokémon,
+  ISpecies,
+} from "./Interfaces/interface";
+
+interface Favorite {
+  id: number;
+  name: string;
+  image: string;
+}
+
 export default function Home() {
-  const  [Fav, setHandleFav] = useState<boolean>(false);
+  const [pokeOrig, setPokeOrig] = useState(false);
+  const [pokeShiny, setPokeShiny] = useState(false);
+  const [pokemon, setPokemon] = useState<IPokémon | null>(null);
+  const [pokemonLocation, setPokemonLocation] = useState<ILocation[]>([]);
+  const [pokemonEvoluton, setPokemonEvolution] = useState<IEvolution[]>([]);
+  const [search, setSearch] = useState<string>("");
+  const [shinyPokemon, setShinyPokemon] = useState(false);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [evoChain, setEvoChain] = useState([]);
+
+  // Use an effect to fetch the evolution chain data whenever pokemonEvoluton changes
+  useEffect(() => {
+    const fetchEvoChain = async () => {
+      if (pokemonEvoluton.length > 0) {
+        const chain  = await getEvoChain();
+        setEvoChain(chain);
+      }
+    };
+  
+    fetchEvoChain();
+  }, [pokemonEvoluton]);
+  
+  useEffect(() => {
+    const storedFavorites = getLocalStorage();
+    setFavorites(storedFavorites);
+  }, []);
+
+
+  const showPokeImg = () => {
+
+    if (pokeShiny && pokemon?.sprites.other['official-artwork'].front_shiny) {
+        return pokemon.sprites.other['official-artwork'].front_shiny
+    } else {
+        return pokemon?.sprites.other['official-artwork'].front_default;
+    }
+
+}
+const handleRemoveFav = (favoriteId: number) => {
+  const updatedFavorites = favorites.filter((favorite) => favorite.id !== favoriteId);
+  setFavorites(updatedFavorites);
+  localStorage.setItem("Favorites", JSON.stringify(updatedFavorites));
+};
+  function getLocalStorage(): Favorite[] {
+    let localStorageData = localStorage.getItem("Favorites");
+    if (localStorageData == null) {
+      return [];
+    }
+    return JSON.parse(localStorageData);
+  }
+
+  const handleData = async (fetchedData: IPokémon) => {
+    if (fetchedData) {
+      setPokemon(fetchedData);
+
+      const data = await pokemonLocationData(
+        fetchedData.location_area_encounters
+      );
+      setPokemonLocation(data);
+      const species = await pokemonSpeciesData(fetchedData.species.url);
+      const evolution = await pokemonEvolveData(species.evolution_chain.url);
+      setPokemonEvolution([evolution]);
+    } else {
+      alert("please enter pokemons generation 1-5 only!");
+    }
+  };
+
+  const handlePokeSearch = async () => {
+    if (search == "") {
+      alert("Please enter a name or number");
+    }
+    let numberSearch = parseInt(search);
+    if (numberSearch == 0) {
+      alert("Insert a whole number");
+    }
+    if (!isNaN(numberSearch) && numberSearch >= 1 && numberSearch <= 650) {
+      const fetchedData = await pokemonApi(numberSearch.toString());
+
+      if (fetchedData && fetchedData.id === numberSearch) {
+        await handleData(fetchedData);
+      } else {
+        alert("Type in a Pokémon that is 1-5 Generation!");
+      }
+    } else {
+      const fetchedData = await pokemonApi(search.toLowerCase());
+
+      if (
+        fetchedData &&
+        fetchedData.name.toLowerCase() === search.toLowerCase()
+      ) {
+        await handleData(fetchedData);
+      } else {
+        alert("Type in a Pokémon that is 1-5 Generation!");
+      }
+    }
+  };
+
   const handleFav = () => {
-    setHandleFav(!Fav)
-} 
+    if (pokemon) {
+      const newFavorite: Favorite = {
+        id: pokemon.id,
+        name: pokemon.name,
+        image: showPokeImg() || "",
+      };
+      const updatedFavorites = [...favorites, newFavorite];
+      setFavorites(updatedFavorites);
+      localStorage.setItem("Favorites", JSON.stringify(updatedFavorites));
+    }
+  };
+  const getEvoChain = async () => {
+    if (pokemonEvoluton.length === 0) {
+      return "chain goes here!";
+    } else {
+      const evoChain = [];
+      const baseEvolution = pokemonEvoluton[0].chain;
+  
+      // Fetch the base evolution sprite
+      const baseEvoData = await pokemonApi(baseEvolution.species.name);
+      evoChain.push({ name: baseEvolution.species.name, sprite: baseEvoData.sprites.front_default });
+  
+      // Fetch the sprites for each subsequent evolution
+      const fetchEvoSprites = async (evolutions: any) => {
+        for (const evolution of evolutions) {
+          const evoData = await pokemonApi(evolution.species.name);
+          evoChain.push({ name: evolution.species.name, sprite: evoData.sprites.front_default });
+  
+          if (evolution.evolves_to.length > 0) {
+            await fetchEvoSprites(evolution.evolves_to);
+          }
+        }
+      };
+  
+      await fetchEvoSprites(baseEvolution.evolves_to);
+  
+      return evoChain;
+    }
+  };
 
 
   return (
     <div className="bg h-screen bg-no-repeat">
-      <h1 className="text-center text-5xl font-bold pt-2  ">Pokedex</h1>
-      <div className=" flex flex-col-3 justify-center gap-3 pt-2 ">
+      <h1 className="text-center text-5xl font-bold pt-2">Pokedex</h1>
+      <div className="flex flex-col-3 justify-center gap-3 pt-2">
         <div>
-          <input className="rounded-lg w-40 lexendFont font-extralight text-black px-1"></input>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="type number or name"
+            className="rounded-lg w-40 lexendFont font-extralight text-black px-1"
+          ></input>
         </div>
         <div>
-          <Button className="lexendFont w-24 cursor-pointer hover:border-blue-400 bg-blue-700 px-2 rounded-lg font-semibold border-transparent">
+          <button
+            onClick={handlePokeSearch}
+            className="lexendFont w-24 cursor-pointer hover:border-blue-400 bg-blue-700 px-2 rounded-lg font-semibold border-transparent"
+          >
             search
-          </Button>
+          </button>
         </div>
         <div>
-          <Button className="lexendFont w-24 cursor-pointer bg-yellow-400 px-2 rounded-lg font-semibold border-transparent">
+          <button className="lexendFont w-24 cursor-pointer bg-yellow-400 px-2 rounded-lg font-semibold border-transparent">
             random
-          </Button>
+          </button>
         </div>
-        <div>
-          <Button className="lexendFont w-24 cursor-pointer bg-red-500 px-2 rounded-lg border-transparent font-semibold">
-            favorites
-          </Button>
+        <div> 
+          <ModalComponent favorites={favorites} onRemoveFav={handleRemoveFav}></ModalComponent>
         </div>
       </div>
 
       <div className="flex flex-col-3 justify-evenly px-96 mx-28 pt-10">
         <div className="">
-          <h1 className="text-2xl font-bold">#006</h1>
+          <h1 className="text-2xl font-bold">#{pokemon && pokemon.id}</h1>
         </div>
         <div>
-          <h1 className="lexendFont text-2xl pt-1 font-bold">Charizard</h1>
+          <h1 className="lexendFont text-2xl pt-1 font-bold">
+            {pokemon && pokemon.name}
+          </h1>
         </div>
         <div className="text-2xl font-bold">
           <button>
             {" "}
-            <img className="h-5" alt="Heart Button" src={HeartBtn.src}></img>
+            <img
+              className="h-5"
+              alt="Heart Button"
+              onClick={handleFav}
+              src={HeartBtn.src}
+            ></img>
           </button>
         </div>
       </div>
-      <div className="flex flex-col-6 justify-evenly px-96 mx-52 pt-4">
+      <div className="flex flex-col-6 justify-evenly px-96 mx-52">
         <div>
           <h1 className="text-xl font-bold lexendFont">Type:</h1>
-          <h1 className="text-xl font-bold lexendFont">Location:</h1>
-          <h1 className="text-xl font-bold lexendFont">Abilities:</h1>
-          <h1 className="text-xl font-bold lexendFont">Moves:</h1>
+          <h1 className="text-xl font-bold lexendFont pt-2">Location:</h1>
+          <h1 className="text-xl font-bold lexendFont pt-2">Abilities:</h1>
+          <h1 className="text-xl font-bold lexendFont pt-6">Moves:</h1>
         </div>
-        <div>
-          <h1 className="text-xl font-bold lexendFont overflow-scroll">
-            Fire,flying
+        <div className="pl-2">
+          <h1 className="text-base font-bold lexendFont ">
+            {pokemon?.types?.map((type) => type.type.name).join(", ")}
           </h1>
-          <h1 className="text-xl font-bold lexendFont overflow-scroll">
-            Fire,flying
+          <h1 className="text-base font-bold lexendFont overflower">
+            {pokemonLocation
+              ?.map((location) => location.location_area.name)
+              .join(", ") }  
+          
           </h1>
-          <h1 className="text-xl font-bold lexendFont overflow-scroll">
-            Fire,flying
+          <h1 className="text-base font-bold lexendFont  overflower">
+            {pokemon?.abilities
+              ?.map((ability) => ability.ability.name)
+              .join(", ")}
           </h1>
-          <h1 className="text-xl font-bold lexendFont overflow-scroll">
-            Mega-punch,
+          <h1 className="text-base font-bold lexendFont  overflower">
+            {pokemon?.moves?.map((move) => move.move.name).join(", ")}
           </h1>
         </div>
       </div>
-      <div className="flex justify-center mt-20">
-        <img src={Charizard.src} alt="Pokemon"></img>
+      <div className="flex justify-center">
+        <img
+          className="h-56"
+          src={showPokeImg() || Charizard.src}
+          alt="Pokemon"
+        ></img>
       </div>
       <div className="flex justify-center pt-1">
         <div className="flex justify-center bg-gray-500 rounded-3xl bg-opacity-80 h-48 w-1/2 px-5">
-          <h1 className="text-center text-3xl lexendFont font-bold ">
+          <div className="flex justify-center items-center space-x-4">
+          <h1 className="text-center text-3xl lexendFont font-bold">
             Evolutions:
           </h1>
+      {evoChain.map((evo) => (
+        <div key={evo.name} className="flex flex-col items-center">
+          <img src={evo.sprite} alt={evo.name} className="w-20 h-20" />
+          <span className="text-2xl lexendFont">{evo.name}</span>
+        </div>
+      ))}
+    </div>
         </div>
       </div>
     </div>
   );
 }
+
+export const getLocalStorage = (): Favorite[] => {
+  let localStorageData = localStorage.getItem("Favorites");
+
+  if (localStorageData == null) {
+    return [];
+  }
+
+  return JSON.parse(localStorageData);
+};

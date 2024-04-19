@@ -1,4 +1,4 @@
-export interface Ipokemon {
+export interface IPokémon {
     abilities: [{
         ability: {
             name: string
@@ -282,7 +282,7 @@ export interface Ipokemon {
 }
 
 
-export interface Ispecies {
+export interface ISpecies {
     id: number
     name: string
     order: number
@@ -371,7 +371,7 @@ export interface Ispecies {
     ]
 }
 
-export interface Ievolutionchain {
+export interface IEvolution {
     id: number
     baby_trigger_item: string
     chain: {
@@ -421,7 +421,7 @@ export interface Ievolutionchain {
     }
 }
 
-export interface Ilocationarea {
+export interface ILocation {
 
     location_area: {
         name: string,

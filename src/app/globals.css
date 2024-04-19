@@ -39,9 +39,11 @@ body {
   background-size: cover;
   background-position: center; 
   background-repeat: no-repeat;
-}
-.container{
-  display: block;
 
-  width:500px;
+}
+
+.overflower{
+
+  overflow-x: scroll;
+  height: 50px;
 }
