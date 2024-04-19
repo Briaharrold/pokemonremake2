@@ -58,7 +58,10 @@ export default function Home() {
         return pokemon?.sprites.other['official-artwork'].front_default;
     }
 
-}
+} 
+
+
+
 const handleRemoveFav = (favoriteId: number) => {
   const updatedFavorites = favorites.filter((favorite) => favorite.id !== favoriteId);
   setFavorites(updatedFavorites);
@@ -280,12 +283,3 @@ const handleRemoveFav = (favoriteId: number) => {
   );
 }
 
-export const getLocalStorage = () => {
-  let localStorageData = localStorage.getItem("Favorites");
-
-  if (localStorageData == null) {
-    return [];
-  }
-
-  return JSON.parse(localStorageData);
-};
