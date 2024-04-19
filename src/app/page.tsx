@@ -36,14 +36,13 @@ export default function Home() {
   useEffect(() => {
     const fetchEvoChain = async () => {
       if (pokemonEvoluton.length > 0) {
-        const chain  = await getEvoChain();
-        // setEvoChain(chain);
+        const chain : any  = await getEvoChain();
+        setEvoChain(chain);
       }
     };
   
     fetchEvoChain();
-  }, [pokemonEvoluton]);
-  
+  }, [pokemonEvoluton, setEvoChain]); 
   useEffect(() => {
     const storedFavorites = getLocalStorage();
     setFavorites(storedFavorites);
