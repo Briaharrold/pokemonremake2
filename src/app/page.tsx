@@ -1,6 +1,4 @@
 "use client";
-import Image from "next/image";
-import { Button, Modal } from "flowbite-react";
 import HeartBtn from "../../public/assets/Vector-2.png";
 import Charizard from "../../public/assets/Charizard 1-2.png";
 import Favorited from "../../public/assets/Favorited.png";
@@ -22,7 +20,7 @@ import {
 } from "./Interfaces/interface";
 
 export default function Home() {
-  const [pokeOrig, setPokeOrig] = useState(false);
+  const [originalPokemon, setOriginalPokemon] = useState(false);
   const [pokeShiny, setPokeShiny] = useState(false);
   const [pokemon, setPokemon] = useState<IPokémon | null>(null);
   const [pokemonLocation, setPokemonLocation] = useState<ILocation[]>([]);
@@ -60,7 +58,6 @@ export default function Home() {
 } 
 
 
-
 const handleRemoveFav = (favoriteId: number) => {
   const updatedFavorites = favorites.filter((favorite) => favorite.id !== favoriteId);
   setFavorites(updatedFavorites);
@@ -93,7 +90,7 @@ const handleRemoveFav = (favoriteId: number) => {
 
   const handlePokeSearch = async () => {
     if (search == "") {
-      alert("Please enter a name or number");
+      alert("Please enter a of a pokemon name or number");
     }
     let numberSearch = parseInt(search);
     if (numberSearch == 0) {
@@ -266,7 +263,7 @@ const handleRemoveFav = (favoriteId: number) => {
           <h1 className="text-center text-3xl lexendFont font-bold">
             Evolutions:
           </h1>
-          <div className="flex gap-2 overflower mr-4">
+          <div className="flex gap-2  mr-4">
       {evoChain.map((evo) => (
         <div key={evo.name} className="flex  flex-col items-center">
           <img src={evo.sprite} alt={evo.name} className="w-20 h-20" />
