@@ -280,7 +280,16 @@ export interface IPokémon {
     }]
     weight: number
 }
-
+export interface IEvoChainItem {
+    name: string;
+    sprite: string;
+  }
+ export interface IFavorite {
+    id: number;
+    name: string;
+    image: string;
+  }
+  
 
 export interface ISpecies {
     id: number

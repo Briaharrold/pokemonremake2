@@ -17,13 +17,9 @@ import {
   ILocation,
   IPokémon,
   ISpecies,
+  IEvoChainItem,
+  IFavorite
 } from "./Interfaces/interface";
-
-interface Favorite {
-  id: number;
-  name: string;
-  image: string;
-}
 
 export default function Home() {
   const [pokeOrig, setPokeOrig] = useState(false);
@@ -33,10 +29,9 @@ export default function Home() {
   const [pokemonEvoluton, setPokemonEvolution] = useState<IEvolution[]>([]);
   const [search, setSearch] = useState<string>("");
   const [shinyPokemon, setShinyPokemon] = useState(false);
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
-  const [evoChain, setEvoChain] = useState([]);
+  const [favorites, setFavorites] = useState<IFavorite[]>([]);
+  const [evoChain, setEvoChain] = useState<IEvoChainItem[]>([]);
 
-  // Use an effect to fetch the evolution chain data whenever pokemonEvoluton changes
   useEffect(() => {
     const fetchEvoChain = async () => {
       if (pokemonEvoluton.length > 0) {
@@ -124,16 +119,23 @@ const handleRemoveFav = (favoriteId: number) => {
 
   const handleFav = () => {
     if (pokemon) {
-      const newFavorite: Favorite = {
+      const newFavorite: IFavorite = {
         id: pokemon.id,
         name: pokemon.name,
         image: showPokeImg() || "",
       };
-      const updatedFavorites = [...favorites, newFavorite];
-      setFavorites(updatedFavorites);
-      localStorage.setItem("Favorites", JSON.stringify(updatedFavorites));
+  
+      // Check if the pokemon already exists in the favorites array
+      const isDuplicate = favorites.some((favorite) => favorite.id === newFavorite.id);
+  
+      if (!isDuplicate) {
+        const updatedFavorites = [...favorites, newFavorite];
+        setFavorites(updatedFavorites);
+        localStorage.setItem("Favorites", JSON.stringify(updatedFavorites));
+      }
     }
   };
+
   const getEvoChain = async () => {
     if (pokemonEvoluton.length === 0) {
       return "chain goes here!";
@@ -268,7 +270,7 @@ const handleRemoveFav = (favoriteId: number) => {
   );
 }
 
-export const getLocalStorage = (): Favorite[] => {
+export const getLocalStorage = (): IFavorite[] => {
   let localStorageData = localStorage.getItem("Favorites");
 
   if (localStorageData == null) {
