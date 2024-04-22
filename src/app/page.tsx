@@ -2,8 +2,9 @@
 import HeartBtn from "../../public/assets/Vector-2.png";
 import Charizard from "../../public/assets/Charizard 1-2.png";
 import Favorited from "../../public/assets/Favorited.png";
+import ArrowPic from "../../public/assets/maxresdefault 1 (1) 3 1-2.png";
 import { ModalComponent } from "./Components/ModalComopnent";
-import { useState, useEffect } from "react";
+import { useState, useEffect, createElement } from "react";
 import {
   pokemonApi,
   pokemonSpeciesData,
@@ -72,7 +73,17 @@ const handleRemoveFav = (favoriteId: number) => {
     return JSON.parse(localStorageData);
   }
 
+
+  const handleRand = async () => {
+    const randomId = Math.floor(Math.random() * 650) + 1;
+    const fetchedData = await pokemonApi(randomId.toString());
+    await handleData(fetchedData);
+  };
+
   const handleData = async (fetchedData: IPokémon) => {
+
+
+
     if (fetchedData) {
       setPokemon(fetchedData);
 
@@ -89,8 +100,9 @@ const handleRemoveFav = (favoriteId: number) => {
   };
 
   const handlePokeSearch = async () => {
+
     if (search == "") {
-      alert("Please enter a of a pokemon name or number");
+      alert("Please enter a name of a pokemon or number");
     }
     let numberSearch = parseInt(search);
     if (numberSearch == 0) {
@@ -98,7 +110,6 @@ const handleRemoveFav = (favoriteId: number) => {
     }
     if (!isNaN(numberSearch) && numberSearch >= 1 && numberSearch <= 650) {
       const fetchedData = await pokemonApi(numberSearch.toString());
-
       if (fetchedData && fetchedData.id === numberSearch) {
         await handleData(fetchedData);
       } else {
@@ -117,6 +128,7 @@ const handleRemoveFav = (favoriteId: number) => {
       }
     }
   };
+  
 
   const handleFav = () => {
    
@@ -180,7 +192,7 @@ const handleRemoveFav = (favoriteId: number) => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="type number or name"
-            className="rounded-lg   lg:w-40 lexendFont font-extralight text-black px-1"
+            className="rounded-lg  lg:w-40 lexendFontLight text-black px-1"
           ></input>
         </div>
         <div>
@@ -192,7 +204,7 @@ const handleRemoveFav = (favoriteId: number) => {
           </button>
         </div>
         <div>
-          <button className="lexendFont w-24 cursor-pointer bg-yellow-400 px-2 rounded-lg font-semibold border-transparent">
+          <button onClick={handleRand} className="lexendFont w-24 cursor-pointer bg-yellow-400 px-2 rounded-lg font-semibold border-transparent">
             random
           </button>
         </div>
@@ -201,12 +213,12 @@ const handleRemoveFav = (favoriteId: number) => {
         </div>
       </div>
 
-      <div className="flex flex-col-3 justify-evenly px-0 mx-1 lg:px-96 lg:mx-28 pt-10">
+      <div className="flex flex-col-3 justify-evenly  px-0 mx-10 md:pt-28  md:mx-52 lg:px-96 lg:mx-28 pt-3 lg:pt-10">
         <div className="">
           <h1 className="text-2xl font-bold">#{pokemon && pokemon.id}</h1>
         </div>
         <div>
-          <h1 className="lexendFont text-2xl pt-1 font-bold">
+          <h1 className="lexendFont text-2xl pt-0 lg:pt-1 font-bold">
             {pokemon && pokemon.name}
           </h1>
         </div>
@@ -223,18 +235,18 @@ const handleRemoveFav = (favoriteId: number) => {
           </button>
         </div>
       </div>
-      <div className="flex flex-col-6 justify-evenl px-1 mx-1  lg:px-96 lg:mx-52">
+      <div className="flex flex-col-6 justify-evenly px-25 mx-52 md:mx-40 md:px-24 lg:px-96 lg:mx-52">
         <div className="">
           <h1 className="text-xl font-bold lexendFont">Type:</h1>
           <h1 className="text-xl font-bold lexendFont pt-2">Location:</h1>
           <h1 className="text-xl font-bold lexendFont pt-2">Abilities:</h1>
-          <h1 className="text-xl font-bold lexendFont pt-6">Moves:</h1>
+          <h1 className="text-xl font-bold lexendFont pt-0 lg:pt-2">Moves:</h1>
         </div>
         <div className="pl-2">
           <h1 className="text-base font-bold lexendFont ">
             {pokemon?.types?.map((type) => type.type.name).join(", ")}
           </h1>
-          <h1 className="text-base font-bold lexendFont overflower">
+          <h1 className="text-base font-bold lexendFont overflower lg:pt-4">
             {pokemonLocation
               ?.map((location) => location.location_area.name)
               .join(", ") || 'N/A'}  
@@ -245,7 +257,7 @@ const handleRemoveFav = (favoriteId: number) => {
               ?.map((ability) => ability.ability.name)
               .join(", ") || 'N/A'}  
           </h1>
-          <h1 className="text-base font-bold lexendFont  overflower">
+          <h1 className="text-base font-bold lexendFont lg:pt-2   overflower">
             {pokemon?.moves?.map((move) => move.move.name).join(", ")}
           </h1>
         </div>
@@ -257,22 +269,27 @@ const handleRemoveFav = (favoriteId: number) => {
           alt="Pokemon"
         ></img>
       </div>
-      <div className="flex justify-center pt-1">
-        <div className="flex justify-center bg-gray-500 rounded-3xl bg-opacity-80 h-fit lg:h-48 w-1/2 px-5">
-          <div className="flex justify-center items-center space-x-4">
-          <h1 className="text-center text-3xl lexendFont font-bold">
+   
+
+      <div className="flex justify-center mt-8">
+        <div className="bg-gray-500 bg-opacity-80 rounded-3xl p-4 md:p-6 w-full md:w-3/4 lg:w-1/2">
+          <h1 className="text-center text-xl md:text-2xl lg:text-3xl lexendFont font-bold mb-4">
             Evolutions:
           </h1>
-          <div className="flex gap-2  mr-4">
-      {evoChain.map((evo) => (
-        <div key={evo.name} className="flex  flex-col items-center">
-          <img src={evo.sprite} alt={evo.name} className="w-20 h-20" />
-          <span className="text-2xl lexendFont">{evo.name}</span>
-        </div>
-      
-      ))}
-      </div>
-    </div>
+          <div className="flex justify-center overflow-x-auto">
+            <div className="flex space-x-4">
+              {evoChain.map((evo) => (
+                <div key={evo.name} className="flex flex-col items-center">
+                   <div className="flex flex-col-2">
+                  <img src={evo.sprite} alt={evo.name} className="w-16 h-16 md:w-24 md:h-24" />
+                  <img src={ArrowPic.src} className="h-14 mt-6" alt="arrowpic"/>
+                  </div> 
+                  <span className="text-lg md:text-xl lexendFont">{evo.name}</span>
+                
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

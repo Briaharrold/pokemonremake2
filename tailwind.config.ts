@@ -1,4 +1,6 @@
+
 import type { Config } from "tailwindcss";
+
 /** @type {import('tailwindcss').Config} */
 const flowbite = require("flowbite-react/tailwind");
 const config: Config = {
@@ -15,7 +17,11 @@ const config: Config = {
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-    },
+      fontFamily: {
+        Lexend: [ 'Lexend'],
+      }
+
+    }
   },
   plugins: [
     flowbite.plugin(),

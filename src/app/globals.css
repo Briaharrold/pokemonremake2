@@ -1,7 +1,8 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Agbalumo&family=Lexend:wght@100..900&display=swap');
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -15,6 +16,8 @@
     --background-end-rgb: 0, 0, 0;
   }
 }
+
+
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -30,9 +33,26 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  @font-face {
+    font-family: 'Lexend';
+    src: url('../../public/assets/Lexend/static/Lexend-Regular.ttf');
+    font-weight: 100 900;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Lexend2';
+    src: url('../../public/assets/Lexend/static/Lexend-ExtraLight.ttf')
+  }
+ 
+ 
 }
+
+ .lexendFontLight{
+  font-family: 'Lexend2',sans-serif;
+  
+} 
 .lexendFont{
- font-family: "Lexend",sans-serif;
+ font-family: 'Lexend',sans-serif;
 }
 .bg{
   background-image: url(../../public/assets/PokeBackground.png);
@@ -43,7 +63,10 @@ body {
 }
 
 .overflower{
-
   overflow-x: scroll;
-  height: 50px;
+  height: 40px;
+}
+.overflower2{
+  overflow-y: scroll;
+  width: 200px;
 }
